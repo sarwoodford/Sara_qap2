@@ -407,4 +407,4 @@ function buildURL(query, order, count, license){
 
 // console.log(buildURL('dogs', 'ascending', 27, 'cc-by-sa'));
 // console.log(buildURL("sara's website", 'descending', 15, 'cc-by'));
-console.log(buildURL('monarch-Butterflies$$','descending', 50, 'cc-by'));
+// console.log(buildURL('monarch-Butterflies$$','descending', 50, 'cc-by'));
