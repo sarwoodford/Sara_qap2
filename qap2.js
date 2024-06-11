@@ -1,6 +1,6 @@
 // Programming with Javascript - QAP 2
 // Name: Sara Woodford
-// Date: June 2024
+// Date: June 11, 2024
 
 // problem #1
 function snake(value){
