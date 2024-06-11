@@ -26,8 +26,8 @@ function createVideo(src, width, controls){
     return `<video ${src} ${width} ${controls}></video>`
 }   
 
-console.log(createVideo('https://github.com/natiquekeyin/spring2024/blob/main/QAPs/QAP2/qap2.js', 500))
-console.log(createVideo('https://github.com/natiquekeyin/spring2024/blob/main/QAPs/QAP2/qap2.js', 500, true))
+// console.log(createVideo('https://github.com/natiquekeyin/spring2024/blob/main/QAPs/QAP2/qap2.js', 500))
+// console.log(createVideo('https://github.com/natiquekeyin/spring2024/blob/main/QAPs/QAP2/qap2.js', 500, true))
 
 //pronlem 3
 function parseStringDate(date){
@@ -65,7 +65,6 @@ function parseStringDate(date){
 // console.log(parseStringDate('2024-02-30'));
 
 
-
 //problem 4
 function toDateString(d){
 
@@ -91,7 +90,6 @@ function toDateString(d){
 
 // problem 5
 
-
 function normalizeCoord(coordinate){
 
     const coordinateRegex = /^(-?1?[0-7]?[0-9](\.\d{1,6})?|180),(\s*)?(-?[0-8]?[0-9](\.\d{1,6})?|-?90)$/;
@@ -113,9 +111,33 @@ function normalizeCoord(coordinate){
 
 // problem 6
 
-function formatCoords(coordinateArr){
+function formatCoords(...values){
 
+    const validateLatLng = (lat, lng) => {
+        return lat >= -90 && lat <=90 && lng >= -180 && lng <= 180;
+    };
+
+    const coordinates = values.map(value => {
+        var cleanUp = value.replace(/[\[\]\(\)]/g, "");
+
+        const [latForm, lngForm] = cleanUp.split(",");
+
+        if (!latForm || !lngForm) return null;
+
+        const lat = parseFloat(latForm.trim());
+        const lng = parseFloat(lngForm.trim());
+
+        if (isNaN(lat) || isNaN(lng) || !validateLatLng(lat, lng)){
+            return null;
+        }
+
+        return `(${lat}, ${lng})`;
+    }).filter(coord => coord !== null)
+
+    return `(${coordinates.join(" ")})`;
 }
+
+// console.log(formatCoords('60.837, 130.2637', '[40.2736, -59.238]', 'invalid', '0,0'));
 
 // problem 7
 
@@ -188,7 +210,29 @@ function mimeFromFilename(fileName){
 
 function generateLicenseLink(licenseCode, targetBlank){
 
+    const licenses = {
+        'CC-BY' : 'Creative Commons Attribution License',
+        'CC-BY-NC' : 'Creative Commons Attribution-NonCommerical License',
+        'CC-BY-SA' : 'Creative Commons Attribution-ShareAlike License',
+        'CC-BY-ND' : 'Creative Commons Attribution-NoDerivs License',
+        'CC-BY-NC-SA' : 'Creative Commons Attribution-NonCommercial-ShareAlike License',
+        'CC-BY-NC-ND' : 'Creative Commons Attribution-NonCommercial-NoDerivs License'
+    };
+
+    var license = licenseCode.replace('CC-', '');
+    license = license.toLowerCase();
+    var urlLink = `https://creativecommons.org/licenses/${license}/4.0/`;
+    var licenseText = licenses[licenseCode];
+    var targetB = targetBlank ? ' target="_blank"' : '';
+
+    if (!licenses[licenseCode]){
+            urlLink = `<a href=https://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial License</a>`;
+        }
+    return `<a href="${urlLink}" ${targetB}> ${licenseText} </a>`;
 }
+
+// console.log(generateLicenseLink('CC-BY-ND'));
+// console.log(generateLicenseLink('CC-BY-SA', true));
 
 // problem 9 part 1
 
@@ -334,3 +378,33 @@ function none(arr){
 // console.log(none(arExample3))
 
 // problem 10
+
+function buildURL(query, order, count, license){
+    if (!query){
+        throw new Error('Please enter a query.');
+    }
+
+    const orderList = ['ascending', 'descending'];
+    if(!orderList.includes(order)){
+        throw new Error('Order must be ascending or descending.');
+    }
+
+    if(typeof count !== 'number' || count > 50 || count <1){
+        throw new Error('Page count must be between 1-50.');
+    }
+
+    const licenseList = ['none', 'any', 'cc-by', 'cc-by-nc', 'cc-by-sa', 'cc-by-nd', 'cc-by-nc-sa', 'cc-by-nc-nd'];
+    license = license.toLowerCase();
+
+    if(!licenseList.includes(license)){
+        throw new Error('Please enter a valid license.');
+    }
+
+    var queryForUrl = encodeURIComponent(query);
+
+    return `https://api.inaturalist.org/v2/observations?query=${queryForUrl}&count=${count}&order=${order}&license=${license}`;
+}
+
+// console.log(buildURL('dogs', 'ascending', 27, 'cc-by-sa'));
+// console.log(buildURL("sara's website", 'descending', 15, 'cc-by'));
+console.log(buildURL('monarch-Butterflies$$','descending', 50, 'cc-by'));
